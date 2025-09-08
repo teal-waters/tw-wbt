@@ -4,6 +4,7 @@ from functools import wraps
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Callable
+from typing import cast
 
 import geopandas as gpd
 import rioxarray as rx
@@ -36,7 +37,7 @@ def wrap_wbt(wbt_function: Callable) -> Callable:
             temp_output_file = Path(temp_dir) / "output.tif"
 
             wbt_function(*processed_args, output=temp_output_file, **processed_kwargs)
-            return xr.DataArray(rx.open_rasterio(temp_output_file))
+            return cast(xr.DataArray, rx.open_rasterio(temp_output_file))
 
     return _wrapper
 

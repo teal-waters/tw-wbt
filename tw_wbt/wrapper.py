@@ -45,19 +45,26 @@ def wrap_wbt(wbt_function: Callable) -> Callable:
             captured_out = ""
             captured_err = ""
             try:
-                if wbt_instance is not None and hasattr(wbt_instance, "set_working_dir"):
+                if wbt_instance is not None and hasattr(
+                    wbt_instance, "set_working_dir"
+                ):
                     wbt_instance.set_working_dir(str(temp_dir))
 
                 # Capture stdout/stderr emitted by the WhiteboxTools call so we
                 # can include it in diagnostics if something goes wrong.
                 import io
                 import sys
-                from contextlib import redirect_stdout, redirect_stderr
+                from contextlib import redirect_stderr
+                from contextlib import redirect_stdout
 
                 stdout_buf = io.StringIO()
                 stderr_buf = io.StringIO()
                 with redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
-                    ret = wbt_function(*processed_args, output=str(temp_output_file), **processed_kwargs)
+                    ret = wbt_function(
+                        *processed_args,
+                        output=str(temp_output_file),
+                        **processed_kwargs,
+                    )
                 captured_out = stdout_buf.getvalue()
                 captured_err = stderr_buf.getvalue()
             except Exception as exc:  # capture any Python-level exceptions
@@ -92,7 +99,10 @@ def wrap_wbt(wbt_function: Callable) -> Callable:
                             candidate = Path(p)
                         except Exception:
                             continue
-                        if candidate.exists() and candidate.suffix.lower() in (".tif", ".tiff"):
+                        if candidate.exists() and candidate.suffix.lower() in (
+                            ".tif",
+                            ".tiff",
+                        ):
                             src_path = candidate
                             break
 
@@ -101,6 +111,7 @@ def wrap_wbt(wbt_function: Callable) -> Callable:
                         # the same shape and metadata as a minimal placeholder.
                         try:
                             import numpy as np
+
                             src_da = rx.open_rasterio(src_path)
                             dummy = src_da.copy()
                             # Replace data with zeros while preserving dtype
@@ -133,6 +144,7 @@ def wrap_wbt(wbt_function: Callable) -> Callable:
                 # also check current working directory and system temp for stray outputs
                 cwd_listing = [str(p) for p in Path.cwd().glob("**/*")]
                 import tempfile
+
                 sys_tmp = Path(tempfile.gettempdir())
                 sys_tmp_listing = [str(p) for p in sys_tmp.glob("**/*")]
                 raise RuntimeError(

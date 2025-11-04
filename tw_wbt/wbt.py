@@ -18,6 +18,8 @@ quinn_flow_accumulation = wrap_wbt(wbt.quinn_flow_accumulation)
 d_inf_flow_accumulation = wrap_wbt(wbt.d_inf_flow_accumulation)
 d8_flow_accumulation = wrap_wbt(wbt.d8_flow_accumulation)
 slope = wrap_wbt(wbt.slope)
+downslope_distance_transform = wrap_wbt(wbt.downslope_distance_transform)
+elevation_above_streams = wrap_wbt(wbt.elevation_above_streams)
 
 
 def burn(
